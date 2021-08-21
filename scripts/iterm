@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+DIRNAME="$(dirname "$0")"
+
+/usr/bin/env bash "$DIRNAME/spawn-app" "iterm"
+

@@ -1,5 +1,5 @@
 # opens iTerm2
-alt - return : "${HOME}"/.config/yabai/scripts/open_iterm2.sh
+alt - return : "${XDG_CONFIG_HOME:-$HOME/.config}/yabai/scripts/iterm"
 
 # Show system statistics
 fn + lalt - 1 : "${HOME}"/.config/yabai/scripts/show_cpu.sh
