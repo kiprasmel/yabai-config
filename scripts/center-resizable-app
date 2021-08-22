@@ -1,0 +1,12 @@
+#!/usr/bin/env sh
+
+# https://github.com/koekeishiya/yabai/issues/387#issue-555135585
+
+app="${1:-"^iTerm2?"}"
+
+if [ -z "$2" ]; then
+	yabai -m rule --add app="$app" manage=off grid=6:4:1:1:2:4
+else
+	yabai -m rule --add app="$app" manage=on
+fi
+
