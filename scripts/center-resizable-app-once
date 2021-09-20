@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+app="$1"
+
+center-resizable-app "$app"
+sleep 0.1
+center-resizable-app "$app" off
+
