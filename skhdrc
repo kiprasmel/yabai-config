@@ -36,6 +36,17 @@ shift + alt - 8 : yabai -m window --space 8; yabai -m space --focus 8
 shift + alt - 9 : yabai -m window --space 9; yabai -m space --focus 9
 shift + alt - 0 : yabai -m window --space 10; yabai -m space --focus 10
 
+shift + ctrl - 1 : yabai -m window --space 11; yabai -m space --focus 11
+shift + ctrl - 2 : yabai -m window --space 12; yabai -m space --focus 12
+shift + ctrl - 3 : yabai -m window --space 13; yabai -m space --focus 13
+shift + ctrl - 4 : yabai -m window --space 14; yabai -m space --focus 14
+shift + ctrl - 5 : yabai -m window --space 15; yabai -m space --focus 15
+shift + ctrl - 6 : yabai -m window --space 16; yabai -m space --focus 16
+shift + ctrl - 7 : yabai -m window --space 17; yabai -m space --focus 17
+shift + ctrl - 8 : yabai -m window --space 18; yabai -m space --focus 18
+shift + ctrl - 9 : yabai -m window --space 19; yabai -m space --focus 19
+shift + ctrl - 0 : yabai -m window --space 20; yabai -m space --focus 20
+
 # Resize windows
 shift + alt - y : yabai -m window --resize left:-50:0; \
                   yabai -m window --resize right:-50:0
