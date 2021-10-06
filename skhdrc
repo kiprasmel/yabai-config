@@ -115,3 +115,11 @@ shift + lctrl + alt - r : \
 # Make window native fullscreen
 alt - f         : yabai -m window --toggle zoom-fullscreen
 shift + alt - f : yabai -m window --toggle native-fullscreen
+
+# a single keybind for cycling!
+# https://github.com/koekeishiya/yabai/issues/203#issuecomment-700527407
+alt         - escape : "${HOME}"/.config/yabai/scripts/forward-cycle-yabai
+alt + shift - escape : "${HOME}"/.config/yabai/scripts/backward-cycle-yabai
+# lalt - escape : "${HOME}"/.config/yabai/scripts/forward-cycle-yabai
+# ralt - escape : "${HOME}"/.config/yabai/scripts/backward-cycle-yabai
+
