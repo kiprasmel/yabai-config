@@ -2,10 +2,13 @@
 
 # https://github.com/koekeishiya/yabai/issues/203#issuecomment-700527407
 
-# forward
-yabai -m query --spaces --space \
-  | jq -re ".index" \
-  | xargs -I{} yabai -m query --windows --space {} \
-  | jq -sre "add | map(select(.minimized != 1)) | sort_by(.display, .frame.y, .frame.x, .id) | reverse | nth(index(map(select(.focused == 1))) - 1).id" \
-  | xargs -I{} yabai -m window --focus {}
+## forward
+#yabai -m query --spaces --space \
+#  | jq -re ".index" \
+#  | xargs -I{} yabai -m query --windows --space {} \
+#  | jq -sre "add | map(select(.minimized != 1)) | sort_by(.display, .frame.y, .frame.x, .id) | reverse | nth(index(map(select(.\"has-focus\" == true))) - 1).id" \
+#  | xargs -I{} yabai -m window --focus {}
+
+# https://github.com/koekeishiya/yabai/issues/203#issuecomment-1088641580
+if [ "$(yabai -m query --spaces --space | jq -r '.type')" = "stack" ]; then (yabai -m window --focus stack.next || yabai -m window --focus stack.first); else yabai -m window --focus next || yabai -m window --focus first; fi
 
