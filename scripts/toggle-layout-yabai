@@ -1,0 +1,25 @@
+#!/bin/sh
+
+LAYOUT_TYPE="$(yabai -m query --spaces --space | jq -r '.type')"
+
+case "$LAYOUT_TYPE" in
+	bsp)
+		yabai -m space --layout stack
+		printf "bsp -> stack\n"
+		exit 0
+		;;
+	stack)
+		yabai -m space --layout bsp
+		printf "stack -> bsp\n"
+		exit 0
+		;;
+	float)
+		>&2 printf "\ncannot toggle from float!\n\n"
+		# TODO: maybe toggle float <> non-float?
+		exit 1
+		;;
+	*)
+		>&2 printf "\nunknown layout type: $LAYOUT_TYPE\n\n"
+		;;
+esac
+

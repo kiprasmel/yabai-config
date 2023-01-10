@@ -107,6 +107,10 @@ shift + alt - space : \
     yabai -m window --toggle float; \
     yabai -m window --toggle border
 
+# toggle between layouts (bsp/stack)
+shift + alt - g : "$HOME"/.config/yabai/scripts/toggle-layout-yabai
+        alt - g : "$HOME"/.config/yabai/scripts/toggle-layout-yabai
+
 # Restart Yabai
 shift + lctrl + alt - r : \
     /usr/bin/env osascript <<< \
