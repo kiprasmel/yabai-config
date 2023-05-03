@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+SPAWNER="Alacritty"
+
+spawn_app() {
+	app="${1:-alacritty}"
+	echo "spawning $app"
+    open -a "$app"
+}
+
+if ! pgrep -f "$SPAWNER" &>/dev/null; then
+	spawn_app $*
+else
+    # Create a new window
+    script="tell application \"$SPAWNER\" to create window with default profile"
+    ! osascript -e "${script}" &>/dev/null && {
+        # Get pids for any app with "$SPAWNER" and kill
+        while IFS="" read -r pid; do
+            kill -15 "${pid}"
+        done < <(pgrep -f "$SPAWNER")
+		spawn_app $*
+    }
+fi
+

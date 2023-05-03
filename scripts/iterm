@@ -2,5 +2,5 @@
 
 DIRNAME="$(dirname "$0")"
 
-/usr/bin/env bash "$DIRNAME/spawn-app" "iterm"
+/usr/bin/env bash "$DIRNAME/spawn-iterm-app" "iterm"
 

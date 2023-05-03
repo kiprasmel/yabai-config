@@ -2,12 +2,13 @@
 
 spawn_app() {
 	app="${1:-/Applications/iTerm.app}"
+	echo "spawning $app"
     open -a "$app"
 }
 
 # Detects if iTerm2 is running
 if ! pgrep -f "iTerm" &>/dev/null; then
-	spawn_app
+	spawn_app $*
 else
     # Create a new window
     script='tell application "iTerm2" to create window with default profile'
@@ -16,7 +17,7 @@ else
         while IFS="" read -r pid; do
             kill -15 "${pid}"
         done < <(pgrep -f "iTerm")
-		spawn_app
+		spawn_app $*
     }
 fi
 
