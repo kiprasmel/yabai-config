@@ -1,5 +1,9 @@
 # terminal
 alt - return : "${XDG_CONFIG_HOME:-$HOME/.config}/yabai/scripts/iterm"
+# browser
+alt - s : open "http://"
+# vscode
+alt - v : "code"
 
 # Show system statistics
 fn + lalt - 1 : "${HOME}"/.config/yabai/scripts/show-cpu
