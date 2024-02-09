@@ -2,11 +2,11 @@
 alt - return : "${XDG_CONFIG_HOME:-$HOME/.config}/yabai/scripts/iterm"
 
 # Show system statistics
-fn + lalt - 1 : "${HOME}"/.config/yabai/scripts/show_cpu.sh
-fn + lalt - 2 : "${HOME}"/.config/yabai/scripts/show_mem.sh
-fn + lalt - 3 : "${HOME}"/.config/yabai/scripts/show_bat.sh
-fn + lalt - 4 : "${HOME}"/.config/yabai/scripts/show_disk.sh
-fn + lalt - 5 : "${HOME}"/.config/yabai/scripts/show_song.sh
+fn + lalt - 1 : "${HOME}"/.config/yabai/scripts/show-cpu
+fn + lalt - 2 : "${HOME}"/.config/yabai/scripts/show-mem
+fn + lalt - 3 : "${HOME}"/.config/yabai/scripts/yabai-bat
+fn + lalt - 4 : "${HOME}"/.config/yabai/scripts/show-disk
+fn + lalt - 5 : "${HOME}"/.config/yabai/scripts/show-song
 
 # Navigation
 alt - h : yabai -m window --focus west
@@ -82,10 +82,13 @@ shift + alt - o : yabai -m window --resize right:50:0; \
                   yabai -m window --resize left:50:0
 
 # Equalize size of windows
-lctrl + alt - e : yabai -m space --balance
+shift + alt - e : yabai -m space --balance
 
 # Enable / Disable gaps in current workspace
-lctrl + alt - g : yabai -m space --toggle padding; yabai -m space --toggle gap
+shift + alt - g : yabai -m space --padding abs:0:0:0:0; \
+                  yabai -m space --gap abs:10; \
+                  yabai -m space --toggle padding; \
+                  yabai -m space --toggle gap;
 
 # Rotate windows clockwise and anticlockwise
 alt - r         : yabai -m space --rotate 270
@@ -104,12 +107,11 @@ shift + lctrl + alt - l : yabai -m window --insert east
 
 # Float / Unfloat window
 shift + alt - space : \
-    yabai -m window --toggle float; \
-    yabai -m window --toggle border
+    yabai -m window --toggle float;
+    #yabai -m window --toggle border
 
 # toggle between layouts (bsp/stack)
-shift + alt - g : "$HOME"/.config/yabai/scripts/toggle-layout-yabai
-        alt - g : "$HOME"/.config/yabai/scripts/toggle-layout-yabai
+alt - g : "$HOME"/.config/yabai/scripts/toggle-layout-yabai
 
 # Restart Yabai
 shift + lctrl + alt - r : \
@@ -119,7 +121,7 @@ shift + lctrl + alt - r : \
 
 # Make window native fullscreen
 alt - f         : yabai -m window --toggle zoom-fullscreen
-shift + alt - f : yabai -m window --toggle native-fullscreen
+#shift + alt - f : yabai -m window --toggle native-fullscreen
 
 # a single keybind for cycling!
 # https://github.com/koekeishiya/yabai/issues/203#issuecomment-700527407
@@ -127,4 +129,12 @@ alt         - escape : "${HOME}"/.config/yabai/scripts/forward-cycle-yabai
 alt + shift - escape : "${HOME}"/.config/yabai/scripts/backward-cycle-yabai
 # lalt - escape : "${HOME}"/.config/yabai/scripts/forward-cycle-yabai
 # ralt - escape : "${HOME}"/.config/yabai/scripts/backward-cycle-yabai
+
+cmd - h [
+	# empty to avoid error
+	"": ":"
+	# disable everywhere
+	*: ":"
+	#"vscode": '~'
+]
 
