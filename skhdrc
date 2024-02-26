@@ -2,8 +2,6 @@
 alt - return : "${XDG_CONFIG_HOME:-$HOME/.config}/yabai/scripts/iterm"
 # browser
 alt - s : open "http://"
-# vscode
-alt - v : "code"
 
 # Show system statistics
 fn + lalt - 1 : "${HOME}"/.config/yabai/scripts/show-cpu
@@ -126,6 +124,15 @@ shift + lctrl + alt - r : \
 # Make window native fullscreen
 alt - f         : yabai -m window --toggle zoom-fullscreen
 #shift + alt - f : yabai -m window --toggle native-fullscreen
+
+# toggle float
+alt - t : yabai -m window --toggle float; \
+          yabai -m window --grid 8:8:2:0:4:8
+
+# toggle sticky, topmost and resize to picture-in-picture size
+alt - p : yabai -m window --toggle float;\
+          yabai -m window --toggle topmost;\
+          yabai -m window --grid 5:5:4:0:1:1
 
 # a single keybind for cycling!
 # https://github.com/koekeishiya/yabai/issues/203#issuecomment-700527407
