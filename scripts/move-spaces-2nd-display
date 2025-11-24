@@ -1,0 +1,87 @@
+#!/bin/bash
+
+# Move spaces 11-20 to the 2nd display using yabai
+#
+# GOAL:
+#   - Spaces with index 1-10 remain on display 1
+#   - Spaces with index 11-20 are moved to display 2
+#   - Original order of spaces is preserved
+#
+# STRATEGY:
+#   Process spaces in REVERSE order (20 → 19 → 18 → ... → 11)
+#
+#   Why reverse order?
+#   - Moving space 20 doesn't affect indices of spaces 1-19
+#   - Moving space 19 doesn't affect indices of spaces 1-18
+#   - And so on...
+#   - This preserves the original order and avoids index-shifting bugs
+#
+#   Why move by INDEX and not ID?
+#   - Yabai has issues locating spaces by ID after moves
+#   - Moving by current index is more reliable
+#
+# REQUIREMENTS:
+#   - Mission Control must be closed
+#   - Display 2 must exist
+
+echo "Moving spaces 11-20 to display 2..."
+echo ""
+
+echo "Current state:"
+yabai -m query --displays | jq '.[] | {display: .index, spaces: .spaces}'
+echo ""
+
+moved=0
+skipped=0
+errors=0
+
+# Process spaces in reverse order (20 → 11) to preserve ordering
+for space_index in {20..11}; do
+    # Query space info: ID and current display
+    space_info=$(yabai -m query --spaces | jq -r ".[] | select(.index == $space_index) | \"\(.id)|\(.display)\"")
+    
+    # Skip if space doesn't exist
+    if [ -z "$space_info" ]; then
+        continue
+    fi
+    
+    IFS='|' read -r _space_id current_display <<< "$space_info"
+    
+    # Skip if already on display 2
+    if [ "$current_display" = "2" ]; then
+        echo "  Space $space_index: already on display 2 ✓"
+        skipped=$((skipped + 1))
+        continue
+    fi
+    
+    # Move space from display 1 to display 2
+    echo "  Space $space_index: moving to display 2..."
+    result=$(yabai -m space "$space_index" --display 2 2>&1)
+    
+    # Check result
+    if echo "$result" | grep -q "mission-control is active"; then
+        echo "    ✗ ERROR: Mission Control is active"
+        echo "    Please close Mission Control and run again"
+        errors=$((errors + 1))
+        break
+    elif [ -z "$result" ]; then
+        echo "    ✓ Moved successfully"
+        moved=$((moved + 1))
+    else
+        echo "    ✗ ERROR: $result"
+        errors=$((errors + 1))
+    fi
+    
+    sleep 0.05
+done
+
+echo ""
+if [ $errors -eq 0 ]; then
+    echo "✓ Complete! Moved: $moved, Skipped: $skipped"
+else
+    echo "✗ Completed with errors. Moved: $moved, Skipped: $skipped, Errors: $errors"
+fi
+echo ""
+echo "Final state:"
+yabai -m query --displays | jq '.[] | {display: .index, spaces: .spaces}'
+echo ""
