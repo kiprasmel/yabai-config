@@ -187,6 +187,8 @@ alt + shift - escape : "${HOME}"/.config/yabai/scripts/backward-cycle-yabai
 # lalt - escape : "${HOME}"/.config/yabai/scripts/forward-cycle-yabai
 # ralt - escape : "${HOME}"/.config/yabai/scripts/backward-cycle-yabai
 
+cmd + alt - c : ~/.config/yabai/scripts/sub-layout
+
 cmd - h [
 	# empty to avoid error
 	"": ":"
