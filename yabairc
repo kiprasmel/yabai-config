@@ -44,5 +44,32 @@ yabai -m config left_padding                 0 # 12
 yabai -m config right_padding                0 # 12
 yabai -m config window_gap                   0 # 06
 
-echo "yabai configuration loaded.."
+# ============================================================================
+# Space snapshot tracking (for monitor plug/unplug fix)
+# These signals track window-to-space mappings so we can restore after changes
+# ============================================================================
+SNAPSHOT_SCRIPT="${HOME}/.config/yabai/scripts/save-space-snapshot.sh"
+FIX_UNPLUG_SCRIPT="${HOME}/.config/yabai/scripts/fix-unplug.sh"
+FIX_PLUGIN_SCRIPT="${HOME}/.config/yabai/scripts/fix-plugin.sh"
+AUTOFIX_FLAG="${HOME}/.cache/yabai/autofix-enabled"
 
+# Track window movements between spaces
+yabai -m signal --add label="snapshot_space_changed" event=space_changed action="$SNAPSHOT_SCRIPT"
+
+# Track when windows are created or destroyed
+yabai -m signal --add label="snapshot_window_created" event=window_created action="$SNAPSHOT_SCRIPT"
+yabai -m signal --add label="snapshot_window_destroyed" event=window_destroyed action="$SNAPSHOT_SCRIPT"
+
+# Track when windows move to different spaces
+yabai -m signal --add label="snapshot_window_moved" event=window_moved action="$SNAPSHOT_SCRIPT"
+
+# Conditionally enable auto-fix on display changes (if flag file contains "1")
+if [ -f "$AUTOFIX_FLAG" ] && [ "$(cat "$AUTOFIX_FLAG")" = "1" ]; then
+    yabai -m signal --add label="autofix_display_removed" event=display_removed action="$FIX_UNPLUG_SCRIPT"
+    yabai -m signal --add label="autofix_display_added" event=display_added action="$FIX_PLUGIN_SCRIPT"
+    echo "Autofix on display changes: ENABLED"
+else
+    echo "Autofix on display changes: DISABLED (run toggle-autofix.sh to enable)"
+fi
+
+echo "yabai configuration loaded.."
