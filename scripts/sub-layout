@@ -1,0 +1,64 @@
+#!/bin/bash
+#
+# Create a project layout: Browser (left) + Cursor windows (right)
+# Works in current space
+#
+
+BROWSER_APP="Google Chrome"           # or "Safari", "Chrome", etc.
+CODE_APP="Cursor"
+
+# --- Step 1: Get current space ID ---
+SPACE_ID=$(yabai -m query --spaces --space | jq -r '.index')
+
+echo "Setting up layout in space $SPACE_ID..."
+
+# --- Step 2: Ensure apps are running ---
+if ! pgrep -x "$BROWSER_APP" >/dev/null; then
+  echo "Launching $BROWSER_APP..."
+  open -a "$BROWSER_APP"
+  sleep 1
+fi
+
+if ! pgrep -x "$CODE_APP" >/dev/null; then
+  echo "Launching $CODE_APP..."
+  open -a "$CODE_APP"
+  sleep 2
+fi
+
+# --- Step 3: Assign apps to this space ---
+# Move all matching windows here
+yabai -m query --windows | jq -r --arg app "$BROWSER_APP" '.[] | select(.app==$app) | .id' | while read -r id; do
+  yabai -m window "$id" --space "$SPACE_ID"
+done
+
+yabai -m query --windows | jq -r --arg app "$CODE_APP" '.[] | select(.app==$app) | .id' | while read -r id; do
+  yabai -m window "$id" --space "$SPACE_ID"
+done
+
+sleep 0.5
+
+# --- Step 4: Set BSP layout ---
+yabai -m space "$SPACE_ID" --layout bsp
+
+# --- Step 5: Tile windows ---
+# Focus browser and make it occupy left half
+browser_id=$(yabai -m query --windows --space "$SPACE_ID" | jq -r --arg app "$BROWSER_APP" '.[] | select(.app==$app) | .id' | head -n 1)
+if [ -n "$browser_id" ]; then
+  yabai -m window --focus "$browser_id"
+  yabai -m window --grid 1:2:0:0:1:1
+fi
+
+# Focus first Cursor window and make it right half
+cursor_ids=($(yabai -m query --windows --space "$SPACE_ID" | jq -r --arg app "$CODE_APP" '.[] | select(.app==$app) | .id'))
+if [ ${#cursor_ids[@]} -gt 0 ]; then
+  yabai -m window --focus "${cursor_ids[0]}"
+  yabai -m window --grid 1:2:1:0:1:1
+fi
+
+# --- Step 6: Optional - stack Cursor windows vertically or overlap them ---
+# Uncomment this if you want all Cursor windows stacked on the right side
+# for ((i=1; i<${#cursor_ids[@]}; i++)); do
+#   yabai -m window "${cursor_ids[$i]}" --warp east
+# done
+
+echo "✅ Layout set up: $BROWSER_APP (left) + $CODE_APP (right)"
