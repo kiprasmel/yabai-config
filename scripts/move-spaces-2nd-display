@@ -85,3 +85,7 @@ echo ""
 echo "Final state:"
 yabai -m query --displays | jq '.[] | {display: .index, spaces: .spaces}'
 echo ""
+
+yabai --restart-service
+skhd --restart-service
+
