@@ -176,9 +176,9 @@ alt - t : yabai -m window --toggle float; \
           yabai -m window --grid 8:8:2:0:4:8
 
 # toggle sticky, topmost and resize to picture-in-picture size
-alt - p : yabai -m window --toggle float;\
-          yabai -m window --toggle topmost;\
-          yabai -m window --grid 5:5:4:0:1:1
+#alt - p : yabai -m window --toggle float;\
+#          yabai -m window --toggle topmost;\
+#          yabai -m window --grid 5:5:4:0:1:1
 
 # a single keybind for cycling!
 # https://github.com/koekeishiya/yabai/issues/203#issuecomment-700527407
