@@ -5,20 +5,23 @@
 # GOAL:
 #   - Spaces with index 1-10 remain on display 1
 #   - Spaces with index 11-20 are moved to display 2
-#   - Original order of spaces is preserved
+#   - Original order of spaces is preserved (11, 12, 13, ... 20)
 #
-# STRATEGY:
-#   Process spaces in REVERSE order (20 → 19 → 18 → ... → 11)
+# STRATEGY (3-phase approach):
 #
-#   Why reverse order?
-#   - Moving space 20 doesn't affect indices of spaces 1-19
-#   - Moving space 19 doesn't affect indices of spaces 1-18
-#   - And so on...
-#   - This preserves the original order and avoids index-shifting bugs
+#   Phase 1: Collect ID-to-order mapping
+#     - Before any moves, record each space's ID and expected position
+#     - This gives us a stable reference for verification later
 #
-#   Why move by INDEX and not ID?
-#   - Yabai has issues locating spaces by ID after moves
-#   - Moving by current index is more reliable
+#   Phase 2: Move spaces (reverse order 20 → 11)
+#     - Process spaces in REVERSE order to avoid index-shifting bugs
+#     - Moving space 20 doesn't affect indices of spaces 1-19, etc.
+#     - Move by INDEX (yabai has issues locating spaces by ID after moves)
+#
+#   Phase 3: Verify and fix order
+#     - Check if spaces ended up in correct order on display 2
+#     - If wrong, use swaps to fix and warn
+#     - This handles any yabai quirks that cause unexpected ordering
 #
 # REQUIREMENTS:
 #   - Mission Control must be closed
@@ -31,6 +34,29 @@ echo "Current state:"
 yabai -m query --displays | jq '.[] | {display: .index, spaces: .spaces}'
 echo ""
 
+# =============================================================================
+# Phase 1: Collect ID-to-order mapping BEFORE any moves
+# =============================================================================
+echo "Collecting space ID mapping..."
+ordered_ids=""  # space-separated list of IDs in expected order
+
+spaces_json=$(yabai -m query --spaces)
+pos=1
+for idx in {11..20}; do
+    space_id=$(echo "$spaces_json" | jq -r ".[] | select(.index == $idx) | .id")
+    if [ -n "$space_id" ] && [ "$space_id" != "null" ]; then
+        ordered_ids="$ordered_ids $space_id"
+        echo "  Space index $idx -> ID $space_id (expected position $pos)"
+        pos=$((pos + 1))
+    fi
+done
+# Trim leading space
+ordered_ids="${ordered_ids# }"
+echo ""
+
+# =============================================================================
+# Phase 2: Move spaces (existing logic - reverse order 20 → 11)
+# =============================================================================
 moved=0
 skipped=0
 errors=0
@@ -77,10 +103,84 @@ done
 
 echo ""
 if [ $errors -eq 0 ]; then
-    echo "✓ Complete! Moved: $moved, Skipped: $skipped"
+    echo "✓ Move phase complete! Moved: $moved, Skipped: $skipped"
 else
-    echo "✗ Completed with errors. Moved: $moved, Skipped: $skipped, Errors: $errors"
+    echo "✗ Move phase completed with errors. Moved: $moved, Skipped: $skipped, Errors: $errors"
 fi
+
+# =============================================================================
+# Phase 3: Verify and fix order on display 2
+# =============================================================================
+echo ""
+echo "Verifying order on display 2..."
+
+# Helper function: check if ID is in our ordered_ids list
+is_our_space() {
+    local id="$1"
+    echo "$ordered_ids" | grep -qw "$id"
+}
+
+# Get current order of spaces on display 2 (space-separated)
+all_display2_ids=$(yabai -m query --spaces | jq -r '[.[] | select(.display == 2)] | sort_by(.index) | .[].id' | tr '\n' ' ')
+
+# Filter to only include spaces we care about (those in ordered_ids)
+display2_our_spaces=""
+for id in $all_display2_ids; do
+    if is_our_space "$id"; then
+        display2_our_spaces="$display2_our_spaces $id"
+    fi
+done
+display2_our_spaces="${display2_our_spaces# }"
+
+# Check if order matches expected
+needs_reorder=false
+if [ "$ordered_ids" != "$display2_our_spaces" ]; then
+    needs_reorder=true
+fi
+
+if [ "$needs_reorder" = true ]; then
+    echo "  Order is incorrect, fixing with swaps..."
+    echo "    Expected: $ordered_ids"
+    echo "    Actual:   $display2_our_spaces"
+    reorder_count=0
+    
+    # Get expected IDs as positional parameters
+    set -- $ordered_ids
+    expected_count=$#
+    
+    for pos in $(seq 1 $expected_count); do
+        # Get expected ID for this position
+        eval "expected_id=\${$pos}"
+        
+        # Re-query current state: get our spaces on display 2 in current order
+        current_our_spaces=$(yabai -m query --spaces | jq -r '[.[] | select(.display == 2)] | sort_by(.index) | .[].id' | tr '\n' ' ')
+        
+        # Find the ID currently at this position (among our spaces only)
+        current_pos=0
+        actual_id=""
+        for id in $current_our_spaces; do
+            if is_our_space "$id"; then
+                current_pos=$((current_pos + 1))
+                if [ "$current_pos" = "$pos" ]; then
+                    actual_id="$id"
+                    break
+                fi
+            fi
+        done
+        
+        if [ -n "$actual_id" ] && [ "$expected_id" != "$actual_id" ]; then
+            echo "    Position $pos: swapping $actual_id with $expected_id..."
+            yabai -m space "$actual_id" --swap "$expected_id" 2>&1
+            reorder_count=$((reorder_count + 1))
+            sleep 0.05
+        fi
+    done
+    
+    echo "  ⚠ WARNING: Spaces were reordered ($reorder_count swaps performed)"
+else
+    echo "  Order is correct ✓"
+fi
+
 echo ""
 echo "Final state:"
 yabai -m query --displays | jq '.[] | {display: .index, spaces: .spaces}'
@@ -88,4 +188,3 @@ echo ""
 
 yabai --restart-service
 skhd --restart-service
-
