@@ -1,23 +1,23 @@
 #!/usr/bin/env bash
 
+APP="${1:-/Applications/iTerm.app}"
+
 spawn_app() {
-	app="${1:-/Applications/iTerm.app}"
-	echo "spawning $app"
-    open -a "$app"
+	echo "spawning $APP"
+	open -a "$APP"
 }
 
-# Detects if iTerm2 is running
-if ! pgrep -f "iTerm" &>/dev/null; then
-	spawn_app $*
-else
-    # Create a new window
-    script='tell application "iTerm2" to create window with default profile'
-    ! osascript -e "${script}" &>/dev/null && {
-        # Get pids for any app with "iTerm" and kill
-        while IFS="" read -r pid; do
-            kill -15 "${pid}"
-        done < <(pgrep -f "iTerm")
-		spawn_app $*
-    }
-fi
+# Non-destructive fallback: open a new iTerm instance/window without killing existing ones.
+spawn_new_window_fallback() {
+	echo "AppleScript create-window failed; falling back to open -na" >&2
+	open -na "$APP"
+}
 
+if ! pgrep -f "iTerm" &>/dev/null; then
+	spawn_app
+else
+	# Create a new window (requires Automation permission for the caller → iTerm2)
+	if ! osascript -e 'tell application "iTerm2" to create window with default profile'; then
+		spawn_new_window_fallback
+	fi
+fi
