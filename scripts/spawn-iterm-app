@@ -7,10 +7,11 @@ spawn_app() {
 	open -a "$APP"
 }
 
-# Non-destructive fallback: open a new iTerm instance/window without killing existing ones.
-spawn_new_window_fallback() {
-	echo "AppleScript create-window failed; falling back to open -na" >&2
-	open -na "$APP"
+# Activate existing iTerm only — never open -na (that spawns a second
+# instance and breaks Opt+U hotkey scratchpad hide/show).
+spawn_activate_fallback() {
+	echo "AppleScript create-window failed; activating existing iTerm (no new instance)" >&2
+	open -a "$APP"
 }
 
 if ! pgrep -f "iTerm" &>/dev/null; then
@@ -18,6 +19,6 @@ if ! pgrep -f "iTerm" &>/dev/null; then
 else
 	# Create a new window (requires Automation permission for the caller → iTerm2)
 	if ! osascript -e 'tell application "iTerm2" to create window with default profile'; then
-		spawn_new_window_fallback
+		spawn_activate_fallback
 	fi
 fi
