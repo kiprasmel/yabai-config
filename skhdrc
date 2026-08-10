@@ -61,6 +61,9 @@ ctrl + alt - 8 : yabai -m space --focus 28
 ctrl + alt - 9 : yabai -m space --focus 29
 ctrl + alt - 0 : yabai -m space --focus 30
 
+# Toggle to previously focused space (replaces the macOS app switcher)
+cmd - tab         : yabai -m space --focus recent
+cmd + shift - tab : yabai -m space --focus recent
 
 # comment to disable swap
 shift + ctrl - 1 : yabai -m window --space 1 #; yabai -m space --focus 1
