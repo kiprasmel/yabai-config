@@ -6,14 +6,17 @@
 # rm /tmp/skhd_$USER.*
 # skhd -c ./skhdrc
 
-brew services stop yabai
-brew services stop skhd
-
 yabai --stop-service
 skhd --stop-service
 
-rm /tmp/skhd_$USER.*
-rm /tmp/yabai_$USER.*
+# --stop-service is asynchronous; wait for processes to exit
+# before unlinking lock/socket files they still hold.
+for _ in $(seq 1 50); do
+	pgrep -x yabai >/dev/null || pgrep -x skhd >/dev/null || break
+	sleep 0.1
+done
+
+rm -f /tmp/skhd_$USER.* /tmp/yabai_$USER.*
 
 yabai --start-service
 
@@ -22,4 +25,3 @@ if test -n "$DEBUG"; then
 else
 	skhd --start-service
 fi
-
