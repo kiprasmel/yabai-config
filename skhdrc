@@ -27,43 +27,11 @@ shift + alt - m : yabai -m window --space last; yabai -m space --focus last
 shift + alt - p : yabai -m window --space prev; yabai -m space --focus prev
 shift + alt - n : yabai -m window --space next; yabai -m space --focus next
 
-# switch spaces (requires SIP off)
-ctrl - 1 : yabai -m space --focus 1
-ctrl - 2 : yabai -m space --focus 2
-ctrl - 3 : yabai -m space --focus 3
-ctrl - 4 : yabai -m space --focus 4
-ctrl - 5 : yabai -m space --focus 5
-ctrl - 6 : yabai -m space --focus 6
-ctrl - 7 : yabai -m space --focus 7
-ctrl - 8 : yabai -m space --focus 8
-ctrl - 9 : yabai -m space --focus 9
-ctrl - 0 : yabai -m space --focus 10
-
-alt - 1 : yabai -m space --focus 11
-alt - 2 : yabai -m space --focus 12
-alt - 3 : yabai -m space --focus 13
-alt - 4 : yabai -m space --focus 14
-alt - 5 : yabai -m space --focus 15
-alt - 6 : yabai -m space --focus 16
-alt - 7 : yabai -m space --focus 17
-alt - 8 : yabai -m space --focus 18
-alt - 9 : yabai -m space --focus 19
-alt - 0 : yabai -m space --focus 20
-
-ctrl + alt - 1 : yabai -m space --focus 21
-ctrl + alt - 2 : yabai -m space --focus 22
-ctrl + alt - 3 : yabai -m space --focus 23
-ctrl + alt - 4 : yabai -m space --focus 24
-ctrl + alt - 5 : yabai -m space --focus 25
-ctrl + alt - 6 : yabai -m space --focus 26
-ctrl + alt - 7 : yabai -m space --focus 27
-ctrl + alt - 8 : yabai -m space --focus 28
-ctrl + alt - 9 : yabai -m space --focus 29
-ctrl + alt - 0 : yabai -m space --focus 30
-
-# Toggle to previously focused space (replaces the macOS app switcher)
-cmd - tab         : yabai -m space --focus recent
-cmd + shift - tab : yabai -m space --focus recent
+# switch spaces: depends on whether SIP is disabled (yabai focuses spaces) or not (native macos shortcuts).
+# skhdrc-spaces is a symlink to skhdrc-spaces-yabai or skhdrc-spaces-native,
+# set by LARBS' macos-spaces-yabai-no-sip.sh / macos-spaces-native.sh.
+# the path is relative to ~/.skhdrc, which is what skhd reads.
+.load ".config/yabai/skhdrc-spaces"
 
 # comment to disable swap
 shift + ctrl - 1 : yabai -m window --space 1 #; yabai -m space --focus 1
