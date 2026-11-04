@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Locks the screen right away, like ctrl+cmd+q / apple menu > lock screen,
+# w/o synthesizing keystrokes (which would need automation permissions).
+# SACLockScreenImmediate is private (login.framework), but long-standing.
+exec python3 -I -c 'import ctypes; ctypes.CDLL("/System/Library/PrivateFrameworks/login.framework/Versions/Current/login").SACLockScreenImmediate()'
